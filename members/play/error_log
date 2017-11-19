@@ -1,0 +1,3 @@
+[21-Sep-2017 02:57:11 UTC] PHP Warning:  session_start() expects parameter 1 to be array, string given in /home/vanish172/public_html/stevenschessclub.com/members/play/index.php on line 2
+[21-Sep-2017 02:57:12 UTC] PHP Notice:  Undefined variable: _SESSION in /home/vanish172/public_html/stevenschessclub.com/members/play/index.php on line 65
+[21-Sep-2017 02:57:12 UTC] PHP Notice:  Undefined index: key in /home/vanish172/public_html/stevenschessclub.com/members/play/index.php on line 74

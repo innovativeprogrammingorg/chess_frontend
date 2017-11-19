@@ -1,0 +1,62 @@
+/*Created by Nathaniel Blakely*/
+*{
+    margin:0;
+    padding:0;
+}
+#memberHome{
+    border-style:solid;
+    background-color:white
+}
+body.members{
+    background-image:URL('login.jpg');
+}
+main.home{
+    width:1080px;
+    margin:auto;
+    position:relative;
+  
+    height:1200px;
+}
+div.content{
+    position:relative;
+}
+img.main{
+    width:100%;
+    margin-top:50px;
+    position:absolute;
+}
+a.nav{
+    text-decoration: none;
+    color:black;
+    font-size:20px;
+}
+div.chat{
+    border-style:solid;
+    border-radius:5px;
+    width:80%;
+    margin:auto;
+    height:14%;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+div.messages{
+    width:100%;
+    background-color:#DDD;
+    height:84%;
+    border-radius: 4px 4px 0 0 ;
+    overflow-y:scroll;
+}
+input.chat{
+    width:80%;
+    margin: 5px 10px 5px 5%;
+}
+input.submit{
+    padding:1px;
+}
+p.chat{
+    margin: 2px 0 2px 0;
+}
+label.chat{
+    font-weight:bold;
+    margin: 2px 4px 2px 8px;
+}

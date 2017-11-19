@@ -1,0 +1,43 @@
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Invalid Promotion
+Run Success /XXXXXXXT/XXXXXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX b
+Cannot Promote
+Cannot Promote
+Run Success /TnbXkbnr/pPXXpppp/XXXXXXXX/XXqXXXXX/XXXXXXXX/XXXXXXXX/PPPPXPPP/RNBQKBNR b
+Cannot Promote
+Cannot Promote
+Run Success /TnbXkbnr/pXXXpppp/XXXXXXXX/XXXqXXXX/XXXXXXXX/XXXXXXXX/PPPPXPPP/RNBQKBNR b
+Run Success /rnbqkXnT/ppppXXXp/XXXbXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/PPPXPPPP/RNBQKBNR b
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Cannot Promote
+Run Success /rnbqkXnS/ppppbXXp/XXXXXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/PPPXPPPP/RNBQKBNR b
+Run Success /TnXXkbnr/pXXbpppp/XXXqXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/PPPPXPPP/RNBQKBNR b
+Run Success /TnbXkbnr/pXXXpppp/XXXqXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/PPPPXPPP/RNBQKBNR b
+Run Success /TnXXkbnr/pXXXpppp/XXXXbXXX/XXXqXXXX/XXXXXXXX/XXXXXXXX/PPPPXPPP/RNBQKBNR b
+Run Success /qnXXXbTr/pXXXkXpp/XXXXXXXX/XXXXXXXX/XXXXbPXX/XXXXXXXX/PPPXXXPP/RNBQKBNR b
+Run Success /XXXXXbXT/pXXXkXXp/XXnXXXXX/XXXXXXXX/XXXXXXXX/XXXXXXXX/PPXQXXPP/RbXXKBNR b

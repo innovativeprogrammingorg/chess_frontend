@@ -1,0 +1,36 @@
+/*Created by Nathaniel Blakely*/
+table.board, table.board th, table.board td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    user-select: none;
+   
+}
+table.board td{
+    border-spacing: 0;
+    height: 100px;
+    width: 100px;
+}
+table.board{
+    empty-cells:show;
+    border-width:3px;
+    table-layout:fixed;
+}
+table.board tr:nth-child(odd) td:nth-child(even) {
+    background-color: tan;
+}
+table.board tr:nth-child(even) td:nth-child(odd) {
+    background-color: tan;
+}
+table.board tr:nth-child(even) td:nth-child(even) {
+    background-color: white;
+}
+table.board tr:nth-child(odd) td:nth-child(odd) {
+    background-color: white;
+}
+img.piece{
+    background-color:transparent;
+}
+
+img.piece:hover{
+    cursor:grab;
+}

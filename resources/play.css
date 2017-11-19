@@ -1,0 +1,136 @@
+div.join, div.resume{
+    border-style:solid;
+    width:70%;
+    margin:auto;
+    margin-top:50px;
+    height:400px;
+}
+div.create{
+    border-style:solid;
+    width:35%;
+    margin:auto;
+    height:200px;
+    margin-top: 10px;
+}
+h2.title{
+    text-align:center;
+    border-style:solid;
+    border-width: 0 0 1px 0;
+}
+div.game{
+    padding: 2px 0 3px 0;
+    width:90%;
+    margin:auto;
+    border-style:solid;
+    border-radius:3px;
+    margin-top:5px;
+    border-width:1px;
+    position:relative;
+}
+div.games{
+    width:100%;
+    height:93%;
+    overflow-y:scroll;
+}
+div.game span{
+    border-style:solid;
+    border-width: 0 0px 0 1px;
+    
+    padding: 0 2px 0 2px;
+}
+div.game span:first-child{
+   border-style: none;
+}
+button.join{
+    position:absolute;
+    right:5px;
+    top:1px;
+    padding: 1px 3px 1px 3px;
+}
+div.form{
+    
+    width:300px;
+    margin:auto;
+    margin-top:20px;
+    
+}
+div.form label, div.form input, div.form select{
+    margin-top:5px;
+    
+}
+
+div.form label{
+    margin: 5px 5px 0 30px;
+}
+#timeHelp{
+    margin: 5px 0 0 0;
+}
+button.create{
+    display:block;
+    margin:auto;
+    margin-bottom:5px;
+    margin-top: 20px;
+   
+}
+div.resume{
+    height:300px;
+    margin-top:10px;
+}
+h1.title{
+    color:white;
+}
+
+div.online{
+    width:140px;
+    height:500px;
+    position:absolute;
+    right:5px;
+    top:200px;
+    border-radius:5px;
+    border-style:solid;
+    border-width:2px;
+    
+}
+h2.online{
+    text-align:center;
+    font-size:17px;
+    width:100%;
+    border-style:solid;
+    border-width: 0 0 1px 0;
+}
+div.user{
+    padding: 1px 0 1px 4px;
+}
+label.user{
+   padding-left:4px;
+}
+div.chat{
+    border-style:solid;
+    border-radius:5px;
+    width:80%;
+    margin:auto;
+    height:14%;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+div.messages{
+    width:100%;
+    background-color:#DDD;
+    height:84%;
+    border-radius: 4px 4px 0 0 ;
+    overflow-y:scroll;
+}
+input.chat{
+    width:80%;
+    margin: 5px 10px 5px 5%;
+}
+input.submit{
+    padding:1px;
+}
+p.chat{
+    margin: 2px 0 2px 0;
+}
+label.chat{
+    font-weight:bold;
+    margin: 2px 4px 2px 8px;
+}

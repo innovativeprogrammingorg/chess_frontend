@@ -1,0 +1,60 @@
+/*Created by Nathaniel Blakely*/
+body{
+}
+iframe.infopanel{
+    width:220px;
+    height:1000px;
+    position:absolute;
+    top:60px;
+    right:5px;
+    border:none;
+
+}
+h2.info{
+    text-align:center;
+}
+h2.time{
+    text-align:center;
+    margin:5px 0 5px 0;
+}
+div.history{
+    width:80%;
+    height:300px;
+    border-style:solid;
+    border-width:1px;
+    overflow-y: scroll;
+    margin:auto;
+    margin-top:20px;
+}
+table.history{
+    margin:auto;
+    width:100%;
+    
+}
+table.history th{
+    text-align:center;
+}
+table.history td{
+    padding: 2px 0 2px 0;
+    text-align:center;
+}
+p.time{
+    text-align:center;
+    font-size:20px;
+    margin-bottom:5px;
+}
+iframe.board{
+    width:1000px;
+    height:1000px;
+    border:none;
+    margin:60px 0 0 10px;
+}
+#undoHolder{
+    position:absolute;
+    z-index: 20;
+    bottom:-200px;
+    left:41%;
+}
+#undo{
+    padding:3px 6px 3px 6px;
+}
