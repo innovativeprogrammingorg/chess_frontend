@@ -43,7 +43,7 @@ conn.onmessage = function(evt){
             } 
             break;
         case "MOVE":
-            draw_move(data);
+            drawMove(data);
             break;
         case "MOVES_ALL":
             drawMoves(data);
@@ -249,6 +249,9 @@ function move2(element){
     }else{
         row = sR - dR;
         col = sC - dC;
+    }
+    if(dR == 0 && dC == 0){
+        return;
     }
     console.log("Move is row="+row+" col="+col);
     move(row,col);
