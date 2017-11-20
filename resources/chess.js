@@ -1,8 +1,6 @@
 var side;
-var timeUpdate;
 var sR = '';
 var sC = '';
-var updater;
 var height = 830;
 var width = 811;
 var m;
@@ -18,7 +16,9 @@ var moveBlock = false;
 var black_moves = 0;
 var white_moves = 0;
 var turn = 'n';
-
+var oldy = 0;
+var oldx = 0;
+var last_element;
 
 
 conn.onmessage = function(evt){
@@ -47,6 +47,9 @@ conn.onmessage = function(evt){
             break;
         case "MOVES_ALL":
             drawMoves(data);
+            break;
+        case "INVALID_MOVE":
+            revert_move();
             break;
         case "RESIGN":
             clearTimeout(timeUpdate);
@@ -229,9 +232,12 @@ function move(row,col){
 }
 /******************************** Converts the raw position data into coordinates then calls move with the coords **********************************/
 function move2(element){
+    last_element = element;
     clearTimeout(m);
     element.style.zIndex = "0";
     element.style.transform = "translate(0px,0px)";
+    oldy = parseInt(element.style.top);
+    oldx = parseInt(element.style.left);
     var newy = parseInt(element.style.top) + (YPOS-yorig);
     var newx = parseInt(element.style.left) + (XPOS-xorig);
     //console.log("Y="+newy+" X="+newx);
@@ -248,43 +254,21 @@ function move2(element){
         col = sC - dC;//9-((XPOS- (XPOS%(width/8)))/(width/8)+1);
     }else{
         row = sR - dR;
-        col = sC - dC;
+        col = sC + dC;
     }
-    if(dR == 0 && dC == 0){
+    if((dR == 0 && dC == 0) || row == NaN || col == NaN){
+        revert_move();
         return;
     }
     console.log("Move is row="+row+" col="+col);
     move(row,col);
 }
-/******************************** Sends a request to the server to see if the game state has changed **********************************/      
-function change(){
-    var xmlhttp = new XMLHttpRequest();
-        xmlhttp.onreadystatechange = function() {
-            if (this.readyState == 4 && this.status == 200) {
-                if(this.responseText =="true1"||this.responseText=="true0"){
-                    /*If the game state has changed, update everything*/
-                    if(lastMoveCol!=-1&&lastMoveRow!=-1){
-                        removeLastMoveDraw();
-                    }
-                    updateOnce();
-                    updatePiecesOnce();
-                    autoTurn();
-                    autoMoves();
-                }else if(this.responseText=="end"){
-                    /*If the game is over, then stop checking for change*/
-                    clearTimeout(updater);
-                    
-                }
-                if(this.responseText=="true1"||this.responseText=="false1"){
-                    drawOffered();
-                }else{
-                    draw = false;
-                }
-            }};
-        xmlhttp.open("GET", "https://www.innovativeprogramming.org/stevenschessclub.com/resources/change_check.php", true);
-        xmlhttp.send();
-        updater = setTimeout(change, 500);
+
+function revert_move(){
+    last_element.style.top = oldy + "px";
+    last_element.style.left = oldx + "px";
 }
+
 /******************************** Retrieves the FEN from the server, then calls drawboard with the FEN **********************************/ 
 function updateOnce(){
     conn.send("BOARD");
@@ -418,18 +402,6 @@ function drawBlackPieces(input){
     document.getElementById("BPieces").innerHTML = out;
     return;
 }
-/******************************** Retrieves the data on pieces taken**********************************/ 
-function updatePiecesOnce(){
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            piece = explode("%",this.responseText);
-            drawBlackPieces(piece[0]);
-            drawWhitePieces(piece[1]); 
-        }};
-    xmlhttp.open("GET", "/resources/get_pieces.php", true);
-    xmlhttp.send();
-}
 /******************************** Generates the move table, and sends the last move to be drawn**********************************/
 function drawMoves(moves){
     var history = explode(data_sep,moves);
@@ -437,7 +409,7 @@ function drawMoves(moves){
     var bhistory = "<tr><th>Black</th></tr>";
     white_moves = 0;
     black_moves = 0;
-    for(var i = 0;i<Math.floor(history.length/2);i++){
+    for(var i = 0;i<Math.ceil(history.length/2);i++){
         whistory += "<tr><td>"+history[2*i] + "</td></tr>";
         white_moves++;
         if((i*2+1)<history.length){
@@ -448,22 +420,23 @@ function drawMoves(moves){
 
     document.getElementById("white_moves").innerHTML = whistory;
     document.getElementById("black_moves").innerHTML = bhistory;
-    if(history.length>1){
-        if(history.length>1){
-            if(history[history.length-2]=="o-o"||history[history.length-2]=="o-o-o"){
-                if(lastMoveCol!=-1&&lastMoveRow!=-1){
-                        removeLastMoveDraw();
-                }
-                return;
-            }else{
-
-                if(history[history.length-2].indexOf("+")!=-1){
-                    history[history.length-2] = history[history.length-2].substring(0,3);
-                   
-                }
-                drawLastMove(history[history.length-2].substr(2,1),history[history.length-2].substr(1,1));
+    if(history.length>0){
+       
+        if(history[history.length-1]=="o-o"||history[history.length-1]=="o-o-o"){
+            if(lastMoveCol!=-1&&lastMoveRow!=-1){
+                    removeLastMoveDraw();
             }
+            return;
+        }else{
+
+            if(history[history.length-1].indexOf("+")!=-1){
+                history[history.length-1] = history[history.length-1].substring(0,3);
+               
+            }
+            console.log(history[history.length-1]);
+            drawLastMove(history[history.length-1].substr(2,1),history[history.length-1].substr(1,1));
         }
+    
     }
 }
 
@@ -471,13 +444,20 @@ function drawMove(move){
     if(white_moves > black_moves){
         document.getElementById("black_moves").innerHTML += "<tr><td>"+move + "</td></tr>";
         black_moves++;
+        if(side == 'w'){
+            drawLastMove(move[2],move[1]);
+        }
     }else{
         document.getElementById("white_moves").innerHTML += "<tr><td>"+move + "</td></tr>";
         white_moves++;
+        if(side == 'b'){
+             drawLastMove(move[2],move[1]);
+        }
     }
 }
 /******************************** Highlights the last move **********************************/
 function drawLastMove(row,col){
+    console.log("Last Move Given: row = "+row + " col = "+col);
     var columns = ["a","b","c","d","e","f","g","h"];
     var tiles = document.getElementsByClassName("tile");
     if(side=='w'){
@@ -491,6 +471,7 @@ function drawLastMove(row,col){
     if(lastMoveCol==0 && lastMoveRow==0){
         lastMoveCol = 7; 
     }
+    console.log("Last Move: row = "+lastMoveRow + " col = " +  lastMoveCol);
     var element = tiles[((lastMoveRow)*8)+lastMoveCol-1];
     if(lastMoveRow%2==0){
         if(lastMoveCol%2==0){
