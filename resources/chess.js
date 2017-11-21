@@ -58,6 +58,7 @@ conn.onmessage = function(evt){
             break;
         case "SIDE":
             side = data;
+            
             break;
         case "BOARD":
             console.log("Update board called");
@@ -67,6 +68,7 @@ conn.onmessage = function(evt){
             break;
         case "TURN":
             turn = data;
+            turn_swap(data);
             break;
         case "DRAW_ACCEPTED":
             break;
@@ -99,6 +101,14 @@ function stop(){
 function getCharAt(string,index){
      return string.substr(index,1);                
     
+}
+
+function turn_swap(turn){
+    if(turn == 'w'){
+        document.getElementById("turn").innerHTML = "White's Turn";
+    }else{
+        document.getElementById("turn").innerHTML = "Black's Turn";
+    }
 }
 /******************************** Creates the board based on the given FEN **********************************/
 function drawBoard(FEN){
@@ -457,22 +467,26 @@ function drawMove(move){
 }
 /******************************** Highlights the last move **********************************/
 function drawLastMove(row,col){
+    removeLastMoveDraw();
     console.log("Last Move Given: row = "+row + " col = "+col);
     var columns = ["a","b","c","d","e","f","g","h"];
     var tiles = document.getElementsByClassName("tile");
     if(side=='w'){
-        lastMoveCol = columns.indexOf(col)+1;//0-7
+        lastMoveCol = columns.indexOf(col);//0-7
         lastMoveRow = 8-parseInt(row); 
 
     }else{
-        lastMoveCol = (8 - columns.indexOf(col));//0-7
+        lastMoveCol = columns.indexOf(col);//0-7
         lastMoveRow = parseInt(row)-1; //0-7
     }
-    if(lastMoveCol==0 && lastMoveRow==0){
+    /*if(lastMoveCol==0 && lastMoveRow==0){
         lastMoveCol = 7; 
-    }
+    }*/
     console.log("Last Move: row = "+lastMoveRow + " col = " +  lastMoveCol);
-    var element = tiles[((lastMoveRow)*8)+lastMoveCol-1];
+    var element = tiles[(lastMoveRow*8)+lastMoveCol];
+     if(element == undefined){
+        return;
+    }
     if(lastMoveRow%2==0){
         if(lastMoveCol%2==0){
             element.style.backgroundColor = "#D2D48C";
@@ -491,6 +505,9 @@ function drawLastMove(row,col){
 function removeLastMoveDraw(){
     var tiles = document.getElementsByClassName("tile");
     var element = tiles[((lastMoveRow)*8)+lastMoveCol-1];
+    if(element == undefined){
+        return;
+    }
     if(lastMoveRow%2==0){
         if(lastMoveCol%2==0){
             element.style.backgroundColor = "#D2B48C";
