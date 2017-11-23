@@ -8,8 +8,8 @@ var XPOS;
 var YPOS;
 var xorig;
 var yorig;
-var lastMoveRow = -1;
-var lastMoveCol = -1;
+var last_move_row = -1;
+var last_move_col = -1;
 var count = 0;
 var draw = false;
 var moveBlock = false;
@@ -55,6 +55,7 @@ conn.onmessage = function(evt){
             clearTimeout(timeUpdate);
             break;
         case "DRAW_OFFERED":
+            drawOffered();
             break;
         case "SIDE":
             side = data;
@@ -75,7 +76,12 @@ conn.onmessage = function(evt){
         case "TIME":
             drawTime(data);
             break;
-
+        case "PROMOTION":
+            promotion(data);
+            break;
+        case "PROMOTED":
+            clear_promotion();
+            break;
                 
     }
 };
@@ -122,61 +128,67 @@ function drawBoard(FEN){
             var piece = '';
             var i = 0;
             var j = 0;
+            var waction = "";
+            var baction = "";
             if(side=='b'){
                 piece = getCharAt(inp,(inp.length-((k*8)+l))-1);
                 i = 7-k;
                 j = 7-l;
+                baction = "onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)'";
             }else{
                 piece = getCharAt(inp,(k*8)+l);
                 i = k;
                 j = l;
+                waction = "onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)'";
             }
+
             var x = Math.floor(((width/8))*l);
             var y = Math.floor((height/8)-2)*k;
             switch(piece){
                 case "K":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"whiteKing\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKing.svg\">");
+
+                    out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whiteKing\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKing.svg\">");
                     break;
                 case "Q":
                 case "T":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"whiteQueen\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wQueen.svg\">");
+                    out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whiteQueen\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wQueen.svg\">");
                     break;
                 case "R":
                 case "S":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"whiteRook\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wRook.svg\">");
+                    out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whiteRook\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wRook.svg\">");
                     break;
                 case "B":
                 case "A":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"whiteBishop\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wBishop.svg\">");
+                    out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whiteBishop\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wBishop.svg\">");
                     break;
                 case "N":
                 case "O":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"whiteKnight\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKnight.svg\">");
+                    out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whiteKnight\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKnight.svg\">");
                     break;
                 case "P":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"whitePawn\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wPawn.svg\">");
+                    out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whitePawn\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wPawn.svg\">");
                     break;
                 case "k":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackKing\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKing.svg\">");
+                    out = out.concat("<img draggable='false' "+baction+" class='piece' alt=\"blackKing\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKing.svg\">");
                     break;
                 case "q":
                 case "t":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackQueen\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bQueen.svg\">");
+                    out = out.concat("<img draggable='false' "+baction+" class='piece' alt=\"blackQueen\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bQueen.svg\">");
                     break;
                 case "r":
                 case "s":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackRook\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bRook.svg\">");
+                    out = out.concat("<img draggable='false' "+baction+" class='piece' alt=\"blackRook\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bRook.svg\">");
                     break;
                 case "b":
                 case "a":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackBishop\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bBishop.svg\">");
+                    out = out.concat("<img draggable='false' "+baction+" class='piece' alt=\"blackBishop\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bBishop.svg\">");
                     break;
                 case "n":
                 case "o":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackKnight\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKnight.svg\">");
+                    out = out.concat("<img draggable='false' "+baction+" class='piece' alt=\"blackKnight\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKnight.svg\">");
                     break;
                 case "p":
-                    out = out.concat("<img draggable='false' onmousedown='movement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackPawn\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+ y +"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bPawn.svg\">");
+                    out = out.concat("<img draggable='false' "+baction+" class='piece' alt=\"blackPawn\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+ y +"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bPawn.svg\">");
                     break;
                 case "c":
                     out = out.concat("<img draggable='false' onmousedown='bkmovement(this,"+(9-(i+1))+","+(j+1)+")' onmouseup='move2(this)' class='piece' alt=\"blackKing\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKingCheck.svg\">");
@@ -192,15 +204,13 @@ function drawBoard(FEN){
     document.getElementById("pieceHolder").innerHTML = out;
     return;
 }
+
 /******************************** sets the start location of the piece being moved, and then the calls
     movementCont to start the drag action
  **********************************/
 function movement(element, row, col){
     if(side!=turn){
         return;
-    }
-    if(lastMoveCol!=-1&&lastMoveRow!=-1){ //only calls this function is there is a highlight
-        removeLastMoveDraw(); //removes highlight when moving a piece
     }
     xorig = XPOS;
     yorig = YPOS;
@@ -237,6 +247,7 @@ function movementCont(element){
 }
 /******************************** Sends the move data to the server **********************************/
 function move(row,col){
+    removeLastMoveDraw();
     var msg = prepare_message("MOVE",game_id,sR,9-sC,row,9-col);
     conn.send(msg);
 }
@@ -279,22 +290,21 @@ function revert_move(){
     last_element.style.left = oldx + "px";
 }
 
-/******************************** Retrieves the FEN from the server, then calls drawboard with the FEN **********************************/ 
-function updateOnce(){
-    conn.send("BOARD");
-}
 /******************************** Sends a request to the server to undo a move **********************************/ 
 function undo(){
-     conn.send("TAKE_BACK");
+    var msg = prepare_message("TAKE_BACK",game_id);
+    conn.send(msg);
 }
 /**********************************Sends a request to resign to the server**************************************/
 function resign(){
-    conn.send("RESIGN");
+    var msg = prepare_message("RESIGN",game_id);
+    conn.send(msg);
 }
 /**********************************Sends a request to declare the game a draw**************************************/
 function offerDraw(){
     draw = true;
-    conn.send("OFFER_DRAW");
+    var msg = prepare_message("OFFER_DRAW",game_id);
+    conn.send(msg);
 }
 /**********************************Sends a request to accept the draw**************************************/
 function drawOffered(){
@@ -341,10 +351,7 @@ function explode(seperator,string){
 } 
 
 
-/******************************** Updates the Turn display **********************************/
-function autoTurn(){
-    conn.send("TURN");
-}
+
 /******************************** Updates the current time of the game **********************************/
 function drawTime(data){
 
@@ -433,7 +440,7 @@ function drawMoves(moves){
     if(history.length>0){
        
         if(history[history.length-1]=="o-o"||history[history.length-1]=="o-o-o"){
-            if(lastMoveCol!=-1&&lastMoveRow!=-1){
+            if(last_move_col != -1 && last_move_row != -1){
                     removeLastMoveDraw();
             }
             return;
@@ -444,7 +451,12 @@ function drawMoves(moves){
                
             }
             console.log(history[history.length-1]);
-            drawLastMove(history[history.length-1].substr(2,1),history[history.length-1].substr(1,1));
+            if(side == 'w' && white_moves == black_moves){
+                 drawLastMove(history[history.length-1].substr(2,1),history[history.length-1].substr(1,1));
+            }else if(side =='b'&& white_moves != black_moves){
+                 drawLastMove(history[history.length-1].substr(2,1),history[history.length-1].substr(1,1));
+            }
+           
         }
     
     }
@@ -472,29 +484,29 @@ function drawLastMove(row,col){
     var columns = ["a","b","c","d","e","f","g","h"];
     var tiles = document.getElementsByClassName("tile");
     if(side=='w'){
-        lastMoveCol = columns.indexOf(col);//0-7
-        lastMoveRow = 8-parseInt(row); 
+        last_move_col = columns.indexOf(col);//0-7
+        last_move_cow = 8-parseInt(row); 
 
     }else{
-        lastMoveCol = columns.indexOf(col);//0-7
-        lastMoveRow = parseInt(row)-1; //0-7
+        last_move_col = 7 - columns.indexOf(col);//0-7
+        last_move_row = parseInt(row)-1; //0-7
     }
     /*if(lastMoveCol==0 && lastMoveRow==0){
         lastMoveCol = 7; 
     }*/
-    console.log("Last Move: row = "+lastMoveRow + " col = " +  lastMoveCol);
-    var element = tiles[(lastMoveRow*8)+lastMoveCol];
+    console.log("Last Move: row = "+last_move_row + " col = " +  last_move_col);
+    var element = tiles[(last_move_row*8)+last_move_col];
      if(element == undefined){
         return;
     }
-    if(lastMoveRow%2==0){
-        if(lastMoveCol%2==0){
+    if(last_move_row%2==0){
+        if(last_move_col%2==0){
             element.style.backgroundColor = "#D2D48C";
         }else{
             element.style.backgroundColor = "#CCFFCC";
         }
     }else{
-         if(lastMoveCol%2==1){
+         if(last_move_col%2==1){
             element.style.backgroundColor = "#D2D48C";
         }else{
             element.style.backgroundColor = "#CCFFCC";
@@ -504,18 +516,20 @@ function drawLastMove(row,col){
 /******************************** Clears the current highlight to make way for the next highlight **********************************/
 function removeLastMoveDraw(){
     var tiles = document.getElementsByClassName("tile");
-    var element = tiles[((lastMoveRow)*8)+lastMoveCol-1];
+    var element = tiles[((last_move_row)*8)+last_move_col-1];
     if(element == undefined){
+        console.log("ERROR: last move is undefined!");
+        console.log("LAST MOVE IS : "+last_move_row + " "+last_move_col);
         return;
     }
-    if(lastMoveRow%2==0){
-        if(lastMoveCol%2==0){
+    if(last_move_row%2==0){
+        if(last_move_col%2==0){
             element.style.backgroundColor = "#D2B48C";
         }else{
             element.style.backgroundColor = "#FFFFFF";
         }
     }else{
-         if(lastMoveCol%2==1){
+         if(last_move_col%2==1){
             element.style.backgroundColor = "#D2B48C";
         }else{
             element.style.backgroundColor = "#FFFFFF";
@@ -523,16 +537,17 @@ function removeLastMoveDraw(){
     } 
 }
 /******************************** Retrieves the previous moves from the server *********************************/               
-function autoMoves(){
-    conn.send("REQUEST_MOVES");
-}
+
 function clear_promotion(){
     var element = document.getElementById("promotion");
     element.innerHTML = "";
     element.style.zIndex = "-30";
     moveBlock = false;
 }
-function promotion(row,col){
+function promotion(msg){
+    var data = explode(data_sep,msg);
+    var row = parseInt(data[0]);
+    var col = parseInt(data[1]);
     var xp = 0;
     var yp = 0;
     var element = document.getElementById("promotion");
@@ -540,24 +555,24 @@ function promotion(row,col){
     if(side=='b'){
         xp = 8-col;
         yp = 8-row;
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackQueen' onclick=\"promotion_protocol("+row+","+col+",'t')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bQueenPromote.svg\">");
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackRook'  onclick=\"promotion_protocol("+row+","+col+",'s')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bRookPromote.svg\">");
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackBishop'  onclick=\"promotion_protocol("+row+","+col+",'a')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bBishopPromote.svg\">");
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackKnight'  onclick=\"promotion_protocol("+row+","+col+",'o')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKnightPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackQueen' onclick=\"promotion_protocol('t')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bQueenPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackRook'  onclick=\"promotion_protocol('s')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bRookPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackBishop'  onclick=\"promotion_protocol('a')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bBishopPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='blackKnight'  onclick=\"promotion_protocol('o')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/bKnightPromote.svg\">");
     }else{
         xp = col-1;
         yp = row-1;
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteQueen'  onclick=\"promotion_protocol("+row+","+col+",'T')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wQueenPromote.svg\">");
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteRook'  onclick=\"promotion_protocol("+row+","+col+",'S')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wRookPromote.svg\">");
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteBishop'  onclick=\"promotion_protocol("+row+","+col+",'A')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wBishopPromote.svg\">");
-        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteKnight'  onclick=\"promotion_protocol("+row+","+col+",'O')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKnightPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteQueen'  onclick=\"promotion_protocol('T')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wQueenPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteRook'  onclick=\"promotion_protocol('S')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wRookPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteBishop'  onclick=\"promotion_protocol('A')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wBishopPromote.svg\">");
+        out = out.concat("<img draggable='false' style='width:100px;' class='piece' alt='whiteKnight'  onclick=\"promotion_protocol('O')\" src=\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKnightPromote.svg\">");
     }
     element.style.left = Math.floor(((width/8))*xp)+"px";
     element.style.zIndex = "40";
     element.innerHTML = out;
     moveBlock = true;
 }
-function promotion_protocol(row,col,piece){
-    var msg = prepare_message("PROMOTION",row,col,piece);
+function promotion_protocol(piece){
+    var msg = prepare_message("PROMOTION",game_id,piece);
     conn.send(msg);
 }
