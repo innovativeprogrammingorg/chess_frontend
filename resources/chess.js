@@ -21,13 +21,23 @@ var oldx = 0;
 var last_element;
 
 
+function msg_trim(msg){
+    var i;
+    var out = msg;
+    while(out.charCodeAt(0)<65){
+        out = out.substr(1);
+    }
+    return out;
+}
+
 conn.onmessage = function(evt){
     console.log(evt);
     var msg = evt.data;
-    msg = msg.substr(4);
+    msg = msg_trim(msg);
     var data = explode(command_sep,msg);
     var command = data[0];
     data = data[1];
+    console.log(command);
     switch(command){
         case "LOGGED_IN":
             var resp = prepare_message("GET_GAME_ALL",game_id);
@@ -422,6 +432,8 @@ function drawBlackPieces(input){
 /******************************** Generates the move table, and sends the last move to be drawn**********************************/
 function drawMoves(moves){
     var history = explode(data_sep,moves);
+    console.log("Drawing moves");
+    console.log(history);
     var whistory = "<tr><th>White</th></tr>";
     var bhistory = "<tr><th>Black</th></tr>";
     white_moves = 0;
