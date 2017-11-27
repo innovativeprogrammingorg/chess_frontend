@@ -19,6 +19,8 @@ var turn = 'n';
 var oldy = 0;
 var oldx = 0;
 var last_element;
+var white_time = 0;
+var black_time = 0;
 
 
 function msg_trim(msg){
@@ -31,18 +33,18 @@ function msg_trim(msg){
 }
 
 conn.onmessage = function(evt){
-    console.log(evt);
     var msg = evt.data;
     msg = msg_trim(msg);
     var data = explode(command_sep,msg);
     var command = data[0];
     data = data[1];
     console.log(command);
+    console.log(evt);
     switch(command){
         case "LOGGED_IN":
             var resp = prepare_message("GET_GAME_ALL",game_id);
             conn.send(resp);
-            console.log(resp);
+            //console.log(resp);
             break;
          case "CHAT":
             drawChat(data,false);
@@ -69,7 +71,6 @@ conn.onmessage = function(evt){
             break;
         case "SIDE":
             side = data;
-            
             break;
         case "BOARD":
             console.log("Update board called");
@@ -92,18 +93,19 @@ conn.onmessage = function(evt){
         case "PROMOTED":
             clear_promotion();
             break;
-                
+        case "WHITE_TAKEN_ALL":
+            drawBlackPieces(data);
+            break;
+        case "BLACK_TAKEN_ALL":
+            drawWhitePieces(data);
+            
+            break;
     }
 };
 
 function start(){
-    /*autoTime();
-    autoTurn();
-    autoMoves();
-    updatePiecesOnce();
-    updateOnce();
-    change();*/
     init_game();
+    
 }
 /******************************** sets the side of the current user**********************************/
 function setSide(s){
@@ -156,7 +158,6 @@ function drawBoard(FEN){
             var y = Math.floor((height/8)-2)*k;
             switch(piece){
                 case "K":
-
                     out = out.concat("<img draggable='false' "+waction+" class='piece' alt=\"whiteKing\" style=\"position:absolute; width: 100px; left:"+x+"px; top:"+y+"px;\" src =\"https://www.innovativeprogramming.org/stevenschessclub.com/resources/wKing.svg\">");
                     break;
                 case "Q":
@@ -219,7 +220,7 @@ function drawBoard(FEN){
     movementCont to start the drag action
  **********************************/
 function movement(element, row, col){
-    if(side!=turn){
+    if(side != turn){
         return;
     }
     xorig = XPOS;
@@ -227,7 +228,7 @@ function movement(element, row, col){
     if(sC==''){
         sR = row;
         sC = col;
-        element.style.zIndex= "20"; //makes sure the dragged piece won't go underneath other objects while being dragged
+        element.style.zIndex = "20"; //makes sure the dragged piece won't go underneath other objects while being dragged
         m = setTimeout(movementCont,60,element);
     }else{
         sR = '';
@@ -236,9 +237,8 @@ function movement(element, row, col){
 }
 /*******************************Changes the checked black king to the normal king when moved***********************************/
 function bkmovement(element,row,col){
-    
-     element.src = "https://www.stevenschessclub.com/resources/bKing.svg";
-     movement(element,row,col);
+    element.src = "https://www.stevenschessclub.com/resources/bKing.svg";
+    movement(element,row,col);
 }
 /*******************************Changes the checked white king to the normal king when moved***********************************/
 function wkmovement(element,row,col){
@@ -253,6 +253,8 @@ function mouseLocation(event){
 /******************************** Continues the dragging of the piece **********************************/
 function movementCont(element){
     element.style.transform = "translate("+(XPOS-xorig)+"px,"+(YPOS-yorig)+"px)";
+    document.getElementById("out_row").innerHTML = Math.round((YPOS-yorig)/100);
+    document.getElementById("out_col").innerHTML = Math.round((XPOS-xorig)/100);
     m = setTimeout(movementCont,40,element);
 }
 /******************************** Sends the move data to the server **********************************/
@@ -276,8 +278,8 @@ function move2(element){
     element.style.left = newx+"px";
     var col = 0;
     var row = 0;
-    var dR = ((YPOS-yorig)-(YPOS-yorig)%100)/100;
-    var dC = ((XPOS-xorig)-(XPOS-xorig)%100)/100;
+    var dR = Math.round((YPOS-yorig)/100);
+    var dC = Math.round((XPOS-xorig)/100);
     //console.log("dC="+dC + "  dR="+dR);
     //console.log("dX="+(XPOS-xorig)+" dy="+(YPOS-yorig))
     if(side=='b'){
@@ -360,17 +362,56 @@ function explode(seperator,string){
     return out;
 } 
 
-
+function time_tick(){
+    //console.log("tick");
+    if(turn == 'w'){
+        if(white_time>0){
+            white_time--;
+        }
+        document.getElementById("WTime").innerHTML = "White " + format_time(white_time);
+      
+        setTimeout(time_tick,1000);
+        
+    }else{
+        if(black_time>0){
+            black_time--;
+        }
+        document.getElementById("BTime").innerHTML = "Black " + format_time(black_time);
+        
+        setTimeout(time_tick,1000);
+        
+    }
+    
+}
 
 /******************************** Updates the current time of the game **********************************/
 function drawTime(data){
-
     var time = explode(data_sep,data);
-    document.getElementById("WTime").innerHTML = "White "+time[0];
-    document.getElementById("BTime").innerHTML = "Black "+time[1];
+    if(white_time == 0 && black_time == 0){
+        time_tick();
+    }
+    white_time = parseInt(time[0]);
+    black_time = parseInt(time[1]);
+    document.getElementById("WTime").innerHTML = "White " + format_time(white_time);
+    document.getElementById("BTime").innerHTML = "Black " + format_time(black_time);
 }
+
+function format_time(sec){
+    var min = Math.floor(sec/60);
+    var seconds = sec % 60; 
+    var out = ""+ min;
+    out = out + ":";
+    if(seconds<10){
+        out = out + "0"; 
+    }
+    out = out + seconds;
+    return out
+}
+
 /******************************** Generates the display of pieces taken by White **********************************/
 function drawWhitePieces(input){
+    console.log("Draw White Pieces: ");
+    console.log(input);
     var out = '';
     for(var i = 0; i<input.length;i++){
         var p = getCharAt(input,i);
@@ -497,7 +538,7 @@ function drawLastMove(row,col){
     var tiles = document.getElementsByClassName("tile");
     if(side=='w'){
         last_move_col = columns.indexOf(col);//0-7
-        last_move_cow = 8-parseInt(row); 
+        last_move_row = 8 - parseInt(row); 
 
     }else{
         last_move_col = 7 - columns.indexOf(col);//0-7
@@ -509,6 +550,7 @@ function drawLastMove(row,col){
     console.log("Last Move: row = "+last_move_row + " col = " +  last_move_col);
     var element = tiles[(last_move_row*8)+last_move_col];
      if(element == undefined){
+        console.log("ERROR: CANNOT DRAW LAST MOVE!");
         return;
     }
     if(last_move_row%2==0){
@@ -528,13 +570,13 @@ function drawLastMove(row,col){
 /******************************** Clears the current highlight to make way for the next highlight **********************************/
 function removeLastMoveDraw(){
     var tiles = document.getElementsByClassName("tile");
-    var element = tiles[((last_move_row)*8)+last_move_col-1];
+    var element = tiles[((last_move_row)*8)+last_move_col];
     if(element == undefined){
         console.log("ERROR: last move is undefined!");
         console.log("LAST MOVE IS : "+last_move_row + " "+last_move_col);
         return;
     }
-    if(last_move_row%2==0){
+    if(last_move_row%2==1){
         if(last_move_col%2==0){
             element.style.backgroundColor = "#D2B48C";
         }else{
@@ -546,7 +588,7 @@ function removeLastMoveDraw(){
         }else{
             element.style.backgroundColor = "#FFFFFF";
         }
-    } 
+    }
 }
 /******************************** Retrieves the previous moves from the server *********************************/               
 

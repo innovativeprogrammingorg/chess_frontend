@@ -81,6 +81,10 @@ session_start();
                     </tr>
                 </table>
             </nav>
+            <div id="debug">
+                <p id="out_row">X</p>
+                <p id="out_col">X</p>
+            </div>
             <div id="main" class="board">
                 <div onmousemove = 'mouseLocation(event)'  id='pieceHolder'></div>
                 <div id ='promotion'></div>
